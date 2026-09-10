@@ -115,36 +115,7 @@ Mode B never simulates researcher decisions. It either defers them
 
 ### Pipeline integration
 
-If you are building an automated pipeline (CI, SDLC agent, eval
-harness) that invokes this skill, you **must** pass `--assume-defaults`
-or explicit `--framework`/`--review` flags in every invocation. The
-skill cannot auto-detect that it is running in an automated context —
-if arguments are missing, it stops with an error rather than silently
-skipping researcher gates.
-
-**Recommended invocation for fully automated pipelines:**
-
-```
-<interface-input> --assume-defaults
-```
-
-This is equivalent to `--framework nielsen --review none` with no
-specialist passes. Reports are emitted with an **Unreviewed Draft**
-banner so a researcher can review findings later.
-
-**If you want a human in the loop at review time:**
-
-```
-<interface-input> --framework nielsen --review chat
-```
-
-The skill runs all evaluator passes autonomously, then pauses and
-presents consolidated findings for a human to confirm or override
-before writing final reports.
-
-**One-time setup:** Configure your pipeline to always pass the
-appropriate flags. Individual invocations do not require manual
-intervention once the pipeline is set up correctly.
+Automated callers must pass `--assume-defaults` (equivalent to `--framework nielsen --review none`) or explicit `--framework`/`--review` flags. The skill cannot auto-detect automation context — missing flags produce an error. See [human-vs-agent-operation.md](references/human-vs-agent-operation.md) for setup guidance.
 
 ---
 
@@ -216,17 +187,7 @@ state — not the document behind the page.
 6. **Build an inspection summary** listing screenshots, page-structure
    observations, and interactive states.
 
-**Do not fetch the page as a document.** Never use curl, wget,
-WebFetch, `http.get`, or any raw HTTP/HTML dump to obtain content
-for evaluation. Fetched markup omits layout, visual hierarchy,
-client-rendered UI, hover/focus states, and interaction — so findings
-from it are not a usability inspection of the interface.
-
-**If no live browser is available:** Stop. Ask the researcher to
-enable browser tools or provide screenshots of each key screen/flow
-step. Do **not** fall back to curl/WebFetch. Do **not** invent
-findings from a URL alone. Note in Coverage Notes only after the
-researcher supplies inspectable screens (or a browser session).
+**If no live browser is available:** Stop. Ask the researcher to provide screenshots. Do **not** fall back to curl, wget, or WebFetch — fetched markup omits layout, rendered UI, and interaction states. Do not invent findings from a URL alone.
 
 ### Heuristic framework(s)
 
@@ -514,19 +475,6 @@ from the plugin's `plugin.json` manifest and populate `[version]`.
   raw-HTTP the page source as the inspection method. A fetched
   document is not the user experience. URLs require a live browser;
   if that is unavailable, stop and ask for screenshots.
-
----
-
-## What This Skill Does NOT Do
-
-- **Assign severity ratings.** The researcher assigns these in Step 4.
-- **Recommend design changes.** Surfaces violations only.
-- **Replace usability testing.** Complements it.
-- **Guarantee completeness.** Three evaluators won't catch everything.
-- **Audit accessibility.** No axe/WCAG scans, no conformance scoring.
-  If asked, decline and point to a dedicated accessibility skill.
-- **Evaluate from fetched HTML.** No curl, wget, or WebFetch of a
-  URL. Live browser or researcher-provided screenshots only.
 
 ## Reference Docs
 
